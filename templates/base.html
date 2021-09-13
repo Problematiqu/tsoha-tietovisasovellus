@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> {% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    <h1> Tietovisasovellus </h1>
+    <ul>
+        <li><a href="/">Etusivu</a></li>
+        <li><a href="/quiz">Visa</a></li>
+        <li><a href="/scoreboard">Scoreboard</a></li>
+    </ul>
+    <ul>
+        <li><a href="/login">Kirjaudu sisään</a></li>
+        <li><a href="Rekisteröidy">Rekisteröidy</a></li>
+    </ul>
+    {% block content %}{% endblock %}
+</body>
+
+</html>
