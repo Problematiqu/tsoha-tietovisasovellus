@@ -1,4 +1,12 @@
 {% extends "base.html" %}
-{% block title %} Kirjautuminen {% endblock %}
+{% block title %} Kirjautuminen 
+{% endblock %}
 {% block content %}
+<form action="/login" method="POST">
+    <p>Käyttäjänimi: <br>
+    <input type="text" name="username"></p>
+    <p>Salasana: <br>
+    <input type="password" name="password"></p>
+    <input type="submit" value="Kirjaudu">
+</form>
 {% endblock %}
