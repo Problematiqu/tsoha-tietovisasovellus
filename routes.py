@@ -2,14 +2,50 @@ from app import app
 from db import db
 from flask import render_template, request, redirect, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
+from random import randint, shuffle
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+@app.route("/start")
+def start():
+    return render_template("start.html")
+
 @app.route("/quiz")
 def quiz():
-    return render_template("quiz.html")
+    sql = "SELECT COUNT(id) FROM questions"
+    result = db.session.execute(sql)
+    total = result.fetchone()[0]
+
+    question_numbers = set()
+    while len(question_numbers) < 10:
+        question_numbers.add(randint(1, total))
+
+    questions = {}    
+    for number in question_numbers:
+        sql = "SELECT q.question, o.option, o.correct, o.id FROM questions q LEFT JOIN options o ON q.id = o.question_id WHERE q.id=:number"
+        result = db.session.execute(sql, {"number": number}) 
+        answers = result.fetchall()
+        shuffle(answers)
+        questions[number] = answers
+
+    return render_template("quiz.html", questions=questions)
+
+@app.route("/result", methods=["POST"])
+def result():
+    results = request.form
+    correct_answers = 0
+    for key in results.keys():
+        value = results.get(key)
+        sql = "SELECT correct FROM options WHERE id=:value"
+        query_result = db.session.execute(sql, {"value": value})
+        correct = query_result.fetchone()[0]
+        if correct:
+            correct_answers += 1
+
+    return render_template("finish.html", score=correct_answers)
+
 
 @app.route("/scoreboard")
 def scoreboard():

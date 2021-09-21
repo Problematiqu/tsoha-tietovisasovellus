@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 {% block title %} Visa {% endblock %}
 {% block content %}
-visa
+  <form action="/result" method="POST">
+    {% for question in questions %}
+      <p> {{ questions[question][0][0] }}</p>
+      <input type="radio" name="{{ question }}" value="{{ questions[question][0][3] }}" required="required"> {{ questions[question][0][1]}}
+      <input type="radio" name="{{ question }}" value="{{ questions[question][1][3] }}" required="required"> {{ questions[question][1][1]}}
+      <input type="radio" name="{{ question }}" value="{{ questions[question][2][3] }}" required="required"> {{ questions[question][2][1]}}
+      <input type="radio" name="{{ question }}" value="{{ questions[question][3][3] }}" required="required"> {{ questions[question][3][1]}}
+      <hr>
+    {% endfor %}
+    <input type="submit" value="Lähetä">
+  </form>
 {% endblock %}
