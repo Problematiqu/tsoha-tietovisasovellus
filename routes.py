@@ -24,7 +24,7 @@ def quiz():
 
     questions = {}    
     for number in question_numbers:
-        sql = "SELECT q.question, o.option, o.correct, o.id FROM questions q LEFT JOIN options o ON q.id = o.question_id WHERE q.id=:number"
+        sql = "SELECT q.question, o.option, o.id FROM questions q LEFT JOIN options o ON q.id = o.question_id WHERE q.id=:number"
         result = db.session.execute(sql, {"number": number}) 
         answers = result.fetchall()
         shuffle(answers)
@@ -43,6 +43,10 @@ def result():
         correct = query_result.fetchone()[0]
         if correct:
             correct_answers += 1
+        if "user_id" in session:
+            sql = "INSERT INTO answers (option_id, user_id) VALUES (:option, :user)"
+            db.session.execute(sql, {"option": value, "user": session["user_id"]})
+            db.session.commit()
 
     return render_template("finish.html", score=correct_answers)
 
@@ -62,7 +66,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         
-        sql = "SELECT username, password FROM users WHERE username=:username"
+        sql = "SELECT id, password FROM users WHERE username=:username"
         result = db.session.execute(sql, {"username": username})
         user = result.fetchone()
         if not user:
@@ -71,7 +75,7 @@ def login():
         else:
             hash_value = user.password
             if check_password_hash(hash_value, password):
-                session["username"] = user.username
+                session["user_id"] = user.id
                 return redirect("/")
             else:
                 flash("Käyttäjätunnus tai salasana olivat vääriä")
@@ -79,7 +83,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    del session["username"]
+    del session["user_id"]
     return redirect("/")
 
 @app.route("/register", methods=["GET", "POST"])
