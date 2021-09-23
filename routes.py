@@ -53,9 +53,9 @@ def result():
 
 @app.route("/scoreboard")
 def scoreboard():
-    sql = "SELECT U.username, (CAST(COUNT(*) FILTER (where O.correct) AS FLOAT) / COUNT(*)) * 100 AS average, COUNT(*) AS total " \
+    sql = "SELECT U.username, CEILING((CAST(COUNT(*) FILTER (where O.correct) AS FLOAT) / COUNT(*)) * 100) AS correct_percentage, COUNT(*) AS total " \
           "FROM  answers A INNER JOIN options O ON A.option_id = O.id LEFT JOIN users U ON U.id = A.user_id " \
-          "GROUP BY U.username ORDER BY average DESC, total LIMIT 20"
+          "GROUP BY U.username ORDER BY correct_percentage DESC, total LIMIT 20"
     query_result = db.session.execute(sql)
     scores = query_result.fetchall() 
     return render_template("scoreboard.html", scores=scores)
