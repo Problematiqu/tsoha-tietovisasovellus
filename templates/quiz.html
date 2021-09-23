@@ -3,11 +3,11 @@
 {% block content %}
   <form action="/result" method="POST">
     {% for question in questions %}
-      <p> {{ questions[question][0][0] }}</p>
-      <input type="radio" name="{{ question }}" value="{{ questions[question][0][2] }}" required="required"> {{ questions[question][0][1]}}
-      <input type="radio" name="{{ question }}" value="{{ questions[question][1][2] }}" required="required"> {{ questions[question][1][1]}}
-      <input type="radio" name="{{ question }}" value="{{ questions[question][2][2] }}" required="required"> {{ questions[question][2][1]}}
-      <input type="radio" name="{{ question }}" value="{{ questions[question][3][2] }}" required="required"> {{ questions[question][3][1]}}
+      <p> {{ questions[question][0].question }}</p>
+      <input type="radio" name="{{ question }}" value="{{ questions[question][0].id }}" required="required"> {{ questions[question][0].option}}
+      <input type="radio" name="{{ question }}" value="{{ questions[question][1].id }}" required="required"> {{ questions[question][1].option}}
+      <input type="radio" name="{{ question }}" value="{{ questions[question][2].id }}" required="required"> {{ questions[question][2].option}}
+      <input type="radio" name="{{ question }}" value="{{ questions[question][3].id }}" required="required"> {{ questions[question][3].option}}
       <hr>
     {% endfor %}
     <input type="submit" value="Lähetä">

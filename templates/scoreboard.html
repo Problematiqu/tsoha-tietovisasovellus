@@ -1,4 +1,19 @@
 {% extends "base.html" %}
 {% block title %} Scoreboard {% endblock %}
 {% block content %}
+  <h1> Top-20 visailijat:</h1>
+  <table>
+    <tr>
+      <th> Visailija </th>
+      <th> Oikeita vastauksia prosentteina</th>    
+      <th> Vastattuja kysymyksiä</th>
+    </tr>
+    {% for score in scores %}
+      <tr>
+          <td> {{ score.username }} </td>
+          <td> {{ score.average }} </td>
+          <td> {{ score.total }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 {% endblock %}

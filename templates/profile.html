@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% block title %} Profiili {% endblock %}
 {% block content %}
-<p> Tällä sivulla on käyttäjän profiili!</p>
+  <h1> Profiili </h1>
+  <ul>
+    {% for score in scores %}
+      <li>
+          {{ score.topic }} {{ score.correct }} / {{ score.total }}
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

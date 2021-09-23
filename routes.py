@@ -24,7 +24,7 @@ def quiz():
 
     questions = {}    
     for number in question_numbers:
-        sql = "SELECT q.question, o.option, o.id FROM questions q LEFT JOIN options o ON q.id = o.question_id WHERE q.id=:number"
+        sql = "SELECT Q.question, O.option, O.id FROM questions Q LEFT JOIN options O ON Q.id = O.question_id WHERE Q.id=:number"
         result = db.session.execute(sql, {"number": number}) 
         answers = result.fetchall()
         shuffle(answers)
@@ -53,11 +53,16 @@ def result():
 
 @app.route("/scoreboard")
 def scoreboard():
-    return render_template("scoreboard.html")
+    sql = "SELECT U.username, (CAST(COUNT(*) FILTER (where O.correct) AS FLOAT) / COUNT(*)) * 100 AS average, COUNT(*) AS total " \
+          "FROM  answers A INNER JOIN options O ON A.option_id = O.id LEFT JOIN users U ON U.id = A.user_id " \
+          "GROUP BY U.username ORDER BY average DESC, total LIMIT 20"
+    query_result = db.session.execute(sql)
+    scores = query_result.fetchall() 
+    return render_template("scoreboard.html", scores=scores)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if "username" in session:
+    if "user_id" in session:
         return redirect("/")
 
     if request.method == "GET":
@@ -88,7 +93,7 @@ def logout():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if "username" in session:
+    if "user_id" in session:
         return redirect("/")
 
     if request.method == "GET":
@@ -119,4 +124,12 @@ def register():
         
 @app.route("/profile")
 def profile():
-    return render_template("profile.html")
+    if "user_id" not in session:
+        return redirect("/")
+
+    sql = "SELECT T.id, T.topic, COUNT(*) FILTER (where O.correct) AS correct, COUNT(*) AS total FROM answers A " \
+          "INNER JOIN options O on A.option_id = O.id INNER JOIN questions Q on Q.id = O.question_id INNER JOIN topic T ON T.id = Q.topic_id " \
+          "WHERE A.user_id =:user_id  GROUP BY T.id"
+    query_result = db.session.execute(sql, {"user_id":session["user_id"]})
+    scores = query_result.fetchall()
+    return render_template("profile.html", scores=scores)
