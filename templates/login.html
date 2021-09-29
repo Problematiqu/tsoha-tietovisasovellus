@@ -2,11 +2,41 @@
 {% block title %} Kirjautuminen 
 {% endblock %}
 {% block content %}
-  <form action="/login" method="POST">
-    <p>Käyttäjänimi: <br>
-    <input type="text" name="username"></p>
-    <p>Salasana: <br>
-    <input type="password" name="password"></p>
-    <input type="submit" value="Kirjaudu">
-  </form>
+  <div>
+    <form action="/login" method="POST">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+        <legend> Kirjaudu </legend>
+        <div class="form-group">
+          {{ form.username.label() }}
+          {% if form.username.errors %}
+            {{ form.username(class="is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in form.username.errors %}
+                <span> {{ error }} </span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.username() }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ form.password.label() }}
+          {% if form.password.errors %}
+            {{ form.password(class="is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in form.password.errors %}
+                <span> {{ error }} </span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.password() }}
+          {% endif %}
+        </div>
+      </fieldset>
+      <div class="form-group">
+        {{ form.submit }}
+      </div>
+    </form>
+  </div>
 {% endblock %}

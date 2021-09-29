@@ -3,6 +3,7 @@ from db import db
 from flask import render_template, request, redirect, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from random import randint, shuffle
+from forms import RegisterForm, LoginForm
 
 @app.route("/")
 def index():
@@ -66,25 +67,27 @@ def login():
         return redirect("/")
 
     if request.method == "GET":
-        return render_template("login.html")
+        form = LoginForm()
     else:
-        username = request.form["username"]
-        password = request.form["password"]
-        
-        sql = "SELECT id, password FROM users WHERE username=:username"
-        result = db.session.execute(sql, {"username": username})
-        user = result.fetchone()
-        if not user:
-            flash("Tunnus tai salasana olivat väärin")
-            return redirect("/login")
-        else:
-            hash_value = user.password
-            if check_password_hash(hash_value, password):
-                session["user_id"] = user.id
-                return redirect("/")
-            else:
-                flash("Käyttäjätunnus tai salasana olivat vääriä")
+        form = LoginForm(request.form)
+        if form.validate_on_submit():      
+            sql = "SELECT id, password FROM users WHERE username=:username"
+            result = db.session.execute(sql, {"username": form.username.data})
+            user = result.fetchone()
+            if not user:
+                flash("Käyttäjätunnus tai salasana olivat vääriä", "danger")
                 return redirect("/login")
+            else:
+                hash_value = user.password
+                if check_password_hash(hash_value, form.password.data):
+                    session["user_id"] = user.id
+                    flash(f"Kirjauduttu sisään käyttäjänä {form.username.data}", "success")
+                    return redirect("/")
+                else:
+                    flash("Käyttäjätunnus tai salasana olivat vääriä", "danger")
+                    return redirect("/login")
+
+    return render_template("login.html", form=form)
 
 @app.route("/logout")
 def logout():
@@ -97,30 +100,27 @@ def register():
         return redirect("/")
 
     if request.method == "GET":
-        return render_template("register.html")
+        form = RegisterForm()
     else:
-        username = request.form["username"]
-        password = request.form["password"]
-        repeated_password = request.form["repeated_password"]
+        form = RegisterForm(request.form)
+        if form.validate_on_submit():      
+            sql = "SELECT username FROM users WHERE username=:username"
+            result = db.session.execute(sql, {"username": form.username.data})
+            user = result.fetchone()
+    
+            if user:
+                flash("Käyttäjänimi on jo käytössä", "danger")
+                return render_template("register.html", form=form)
+    
+            hash_value = generate_password_hash(form.password.data)
+            sql = "INSERT INTO users (username, password, admin) VALUES (:username, :password, FALSE)"
+            db.session.execute(sql, {"username":form.username.data, "password":hash_value})
+            db.session.commit()
+            flash(f"Käyttäjätunnus luotu käyttäjälle {form.username.data}", "success")
+    
+            return redirect("/")
 
-        if password != repeated_password:
-            flash("Salasanat eivät olleet samoja")
-            return redirect("/register")
-        
-        sql = "SELECT username FROM users WHERE username=:username"
-        result = db.session.execute(sql, {"username": username})
-        user = result.fetchone()
-
-        if user:
-            flash("Käyttäjänimi on jo käytössä")
-            return redirect("/register")
-
-        hash_value = generate_password_hash(password)
-        sql = "INSERT INTO users (username, password, admin) VALUES (:username, :password, FALSE)"
-        db.session.execute(sql, {"username":username, "password":hash_value})
-        db.session.commit()
-
-        return redirect("/")
+    return render_template("register.html", form=form)
         
 @app.route("/profile")
 def profile():
