@@ -8,7 +8,7 @@
       <th> Oikeita vastauksia prosentteina</th>    
       <th> Vastattuja kysymyksiä</th>
     </tr>
-    {% for score in scores %}
+    {% for score in scoreboard %}
       <tr>
           <td> {{ score.username }} </td>
           <td> {{ score.correct_percentage }} </td>

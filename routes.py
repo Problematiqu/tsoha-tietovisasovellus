@@ -4,6 +4,7 @@ from flask import render_template, request, redirect, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from random import randint, shuffle
 from forms import RegisterForm, LoginForm
+import sql_commands
 
 @app.route("/")
 def index():
@@ -15,51 +16,40 @@ def start():
 
 @app.route("/quiz")
 def quiz():
-    sql = "SELECT COUNT(id) FROM questions"
-    result = db.session.execute(sql)
-    total = result.fetchone()[0]
+    total = sql_commands.question_count()
 
-    question_numbers = set()
-    while len(question_numbers) < 10:
-        question_numbers.add(randint(1, total))
+    question_ids = set()
+    while len(question_ids) < 10:
+        question_ids.add(randint(1, total))
 
     questions = {}    
-    for number in question_numbers:
-        sql = "SELECT Q.question, O.option, O.id FROM questions Q LEFT JOIN options O ON Q.id = O.question_id WHERE Q.id=:number"
-        result = db.session.execute(sql, {"number": number}) 
-        answers = result.fetchall()
-        shuffle(answers)
-        questions[number] = answers
+    for question_id in question_ids:
+        options = sql_commands.get_options(question_id)
+        shuffle(options)
+        questions[question_id] = options
 
     return render_template("quiz.html", questions=questions)
 
 @app.route("/result", methods=["POST"])
 def result():
     results = request.form
-    correct_answers = 0
+    score = 0
+
     for key in results.keys():
         value = results.get(key)
-        sql = "SELECT correct FROM options WHERE id=:value"
-        query_result = db.session.execute(sql, {"value": value})
-        correct = query_result.fetchone()[0]
+        correct = sql_commands.is_correct(value)
         if correct:
-            correct_answers += 1
+            score += 1
         if "user_id" in session:
-            sql = "INSERT INTO answers (option_id, user_id) VALUES (:option, :user)"
-            db.session.execute(sql, {"option": value, "user": session["user_id"]})
-            db.session.commit()
+            sql_commands.add_answer(value, session["user_id"])
 
-    return render_template("finish.html", score=correct_answers)
+    return render_template("finish.html", score=score)
 
 
 @app.route("/scoreboard")
 def scoreboard():
-    sql = "SELECT U.username, CEILING((CAST(COUNT(*) FILTER (where O.correct) AS FLOAT) / COUNT(*)) * 100) AS correct_percentage, COUNT(*) AS total " \
-          "FROM  answers A INNER JOIN options O ON A.option_id = O.id LEFT JOIN users U ON U.id = A.user_id " \
-          "GROUP BY U.username ORDER BY correct_percentage DESC, total LIMIT 20"
-    query_result = db.session.execute(sql)
-    scores = query_result.fetchall() 
-    return render_template("scoreboard.html", scores=scores)
+    scoreboard = sql_commands.get_scoreboard()   
+    return render_template("scoreboard.html", scoreboard=scoreboard)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -71,9 +61,7 @@ def login():
     else:
         form = LoginForm(request.form)
         if form.validate_on_submit():      
-            sql = "SELECT id, password FROM users WHERE username=:username"
-            result = db.session.execute(sql, {"username": form.username.data})
-            user = result.fetchone()
+            user = sql_commands.get_user(form.username.data)
             if not user:
                 flash("Käyttäjätunnus tai salasana olivat vääriä", "danger")
                 return redirect("/login")
@@ -104,18 +92,14 @@ def register():
     else:
         form = RegisterForm(request.form)
         if form.validate_on_submit():      
-            sql = "SELECT username FROM users WHERE username=:username"
-            result = db.session.execute(sql, {"username": form.username.data})
-            user = result.fetchone()
+            user = sql_commands.get_user(form.username.data)
     
             if user:
                 flash("Käyttäjänimi on jo käytössä", "danger")
                 return render_template("register.html", form=form)
     
             hash_value = generate_password_hash(form.password.data)
-            sql = "INSERT INTO users (username, password, admin) VALUES (:username, :password, FALSE)"
-            db.session.execute(sql, {"username":form.username.data, "password":hash_value})
-            db.session.commit()
+            sql_commands.add_user(form.username.data, hash_value)
             flash(f"Käyttäjätunnus luotu käyttäjälle {form.username.data}", "success")
     
             return redirect("/")
@@ -127,9 +111,5 @@ def profile():
     if "user_id" not in session:
         return redirect("/")
 
-    sql = "SELECT T.id, T.topic, COUNT(*) FILTER (where O.correct) AS correct, COUNT(*) AS total FROM answers A " \
-          "INNER JOIN options O on A.option_id = O.id INNER JOIN questions Q on Q.id = O.question_id INNER JOIN topic T ON T.id = Q.topic_id " \
-          "WHERE A.user_id =:user_id  GROUP BY T.id"
-    query_result = db.session.execute(sql, {"user_id":session["user_id"]})
-    scores = query_result.fetchall()
+    scores = sql_commands.get_user_scores(session["user_id"])
     return render_template("profile.html", scores=scores)
