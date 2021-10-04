@@ -16,17 +16,30 @@ def start():
 
 @app.route("/quiz")
 def quiz():
-    total = sql_commands.question_count()
+    if "user_id" in session:
+        remaining_questions = sql_commands.get_quiz(session["user_id"]) 
 
-    question_ids = set()
-    while len(question_ids) < 10:
-        question_ids.add(randint(1, total))
+    if "user_id" in session and remaining_questions:
+        question_ids = set()
+        for question in remaining_questions:
+            question_ids.add(question.question)
+        sql_commands.delete_quiz(session["user_id"])
+
+    else:
+        total = sql_commands.question_count()
+        question_ids = set()
+        while len(question_ids) < 10:
+            question_ids.add(randint(1, total))
 
     questions = {}    
     for question_id in question_ids:
         options = sql_commands.get_options(question_id)
         shuffle(options)
         questions[question_id] = options
+
+    if "user_id" in session:
+        for question_id in question_ids:
+            sql_commands.add_quiz(session["user_id"], question_id)    
 
     return render_template("quiz.html", questions=questions)
 
@@ -43,8 +56,10 @@ def result():
         if "user_id" in session:
             sql_commands.add_answer(value, session["user_id"])
 
-    return render_template("finish.html", score=score)
+    if "user_id" in session:
+        sql_commands.delete_quiz(session["user_id"])
 
+    return render_template("finish.html", score=score)
 
 @app.route("/scoreboard")
 def scoreboard():

@@ -7,9 +7,9 @@
       <fieldset class="form-group">
         <legend> Rekisteröidy </legend>
         <div class="form-group">
-          {{ form.username.label() }}
+          {{ form.username.label(class="form-control-label") }}
           {% if form.username.errors %}
-            {{ form.username(class="is-invalid")}}
+            {{ form.username(class="is-invalid form-control form-control-lg")}}
             <div class="invalid-feedback">
               {% for error in form.username.errors %}
                 <span> {{ error }} </span>
@@ -20,7 +20,7 @@
           {% endif %}
         </div>
         <div class="form-group">
-          {{ form.password.label() }}
+          {{ form.password.label(class="form-control-label") }}
           {% if form.password.errors %}
             {{ form.password(class="is-invalid")}}
             <div class="invalid-feedback">
@@ -33,7 +33,7 @@
           {% endif %}
         </div>
         <div class="form-group">
-          {{ form.repeated_password.label() }}
+          {{ form.repeated_password.label(class="form-control-label") }}
           {% if form.repeated_password.errors %}
             {{ form.repeated_password(class="is-invalid")}}
             <div class="invalid-feedback">

@@ -29,6 +29,12 @@ CREATE TABLE answers (
   user_id INTEGER NOT NULL REFERENCES users
 );
 
+CREATE TABLE quiz (
+  id SERIAL PRIMARY KEY, 
+  user_id INTEGER NOT NULL REFERENCES users,
+  question INTEGER NOT NULL REFERENCES questions
+);
+
 INSERT INTO topic (
   topic
 )

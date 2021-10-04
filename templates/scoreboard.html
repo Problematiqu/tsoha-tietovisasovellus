@@ -5,13 +5,13 @@
   <table>
     <tr>
       <th> Visailija </th>
-      <th> Oikeita vastauksia prosentteina</th>    
+      <th> Oikeita vastauksia</th>    
       <th> Vastattuja kysymyksiä</th>
     </tr>
     {% for score in scoreboard %}
       <tr>
           <td> {{ score.username }} </td>
-          <td> {{ score.correct_percentage }} </td>
+          <td> {{ score.correct_percentage }}% </td>
           <td> {{ score.total }}</td>
       </tr>
     {% endfor %}
