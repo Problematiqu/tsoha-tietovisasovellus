@@ -1,4 +1,69 @@
 {% extends "base.html" %}
 {% block title %} Tietovisasovellus {% endblock %}
 {% block content %}
+  <div>
+    <form action="/add" method="POST">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+        <legend> Lisää kysymys </legend>
+        <div class="form-group">
+          {{ form.question.label() }}
+          {% if form.question.errors %}
+            {{ form.question(class="is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in form.question.errors %}
+                <span> {{ error }} </span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.question() }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ form.topic.label() }}
+          {% if form.topic.errors %}
+            {{ form.topic(class="is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in form.topic.errors %}
+                <span> {{ error }} </span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.topic() }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ form.correct.label() }}
+          {% if form.correct.errors %}
+            {{ form.correct(class="is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in form.correct.errors %}
+                <span> {{ error }} </span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.correct() }}
+          {% endif %}
+        </div>
+        {% for field in form.incorrect %}
+          <div class="form-group">
+            {{ field.label() }} 
+            {% if field.errors %}
+              {{ form.correct(class="is-invalid")}}
+              <div class="invalid-feedback">
+                {% for error in field.errors %}
+                  <span> {{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{field()}}
+            {% endif %}
+          </div>
+        {% endfor %}
+      </fieldset>
+      <div class="form-group">
+        {{ form.submit }}
+      </div>
+    </form>
+  </div>
 {% endblock %}

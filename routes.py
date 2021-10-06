@@ -3,7 +3,7 @@ from db import db
 from flask import render_template, request, redirect, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from random import randint, shuffle
-from forms import RegisterForm, LoginForm
+from forms import AddForm, RegisterForm, LoginForm
 import sql_commands
 
 @app.route("/")
@@ -84,6 +84,7 @@ def login():
                 hash_value = user.password
                 if check_password_hash(hash_value, form.password.data):
                     session["user_id"] = user.id
+                    session["admin"] = sql_commands.get_admin(user.id)
                     flash(f"Kirjauduttu sisään käyttäjänä {form.username.data}", "success")
                     return redirect("/")
                 else:
@@ -95,6 +96,7 @@ def login():
 @app.route("/logout")
 def logout():
     del session["user_id"]
+    del session["admin"]
     return redirect("/")
 
 @app.route("/register", methods=["GET", "POST"])
@@ -128,3 +130,25 @@ def profile():
 
     scores = sql_commands.get_user_scores(session["user_id"])
     return render_template("profile.html", scores=scores)
+
+@app.route("/add", methods=["GET", "POST"])
+def add():
+    if "user_id" not in session: 
+        return redirect("/")
+    
+    admin = sql_commands.get_admin(session["user_id"])
+
+    if not admin:
+        return redirect("/")
+
+    if request.method =="GET":
+        form = AddForm()
+    else:
+        form = AddForm(request.form)
+        if form.validate_on_submit():
+            sql_commands.add_question(form.question.data, int(form.topic.data), form.correct.data, form.incorrect.data)
+            flash(f"Kysymys '{form.question.data}' lisätty!", "success")
+            return redirect("/add")
+            
+    return render_template("add.html", form=form)
+

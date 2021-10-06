@@ -10,6 +10,17 @@ def add_user(username: str, hash_value):
     db.session.execute(sql, {"username": username, "password":hash_value})
     db.session.commit()
 
+def add_question(question: str, topic: int, correct_option: str, options: list):
+    sql = "INSERT INTO questions (question, topic_id) VALUES (:question, :topic) RETURNING id"
+    query_result = db.session.execute(sql, {"question": question, "topic": topic})
+    id = query_result.fetchone()[0]
+    sql = "INSERT INTO options (option, correct, question_id) VALUES (:option, TRUE, :id)"
+    db.session.execute(sql, {"option": correct_option, "id": id})
+    for option in options:
+        sql = "INSERT INTO options (option, correct, question_id) VALUES (:option, FALSE, :id)"
+        db.session.execute(sql, {"option": option, "id": id})
+    db.session.commit()
+
 def add_quiz(id: int, quiz: int):
     sql = "INSERT INTO quiz (user_id, question) VALUES (:id, :quiz)"
     db.session.execute(sql, {"id": id, "quiz": quiz})
@@ -19,6 +30,11 @@ def delete_quiz(id: int):
     sql = "DELETE FROM quiz WHERE user_id=:id"
     db.session.execute(sql, {"id": id})
     db.session.commit()
+
+def get_admin(id: int):
+    sql = "SELECT admin FROM users WHERE id=:id"
+    query_result = db.session.execute(sql, {"id": id})
+    return query_result.fetchone()[0]
 
 def get_options(number: int):
     sql = "SELECT Q.question, O.option, O.id FROM questions Q LEFT JOIN options O ON Q.id = O.question_id WHERE Q.id=:number"
@@ -47,6 +63,11 @@ def get_user_scores(id: int):
 def get_quiz(id: int):
     sql = "SELECT question FROM quiz WHERE user_id=:id"
     query_result = db.session.execute(sql, {"id": id})
+    return query_result.fetchall()
+
+def get_topics():
+    sql = "SELECT id, topic FROM topic"
+    query_result = db.session.execute(sql)
     return query_result.fetchall()
 
 def is_correct(id: int):
