@@ -2,11 +2,11 @@
 {% block title %} Scoreboard {% endblock %}
 {% block content %}
   <h1> Top-20 visailijat:</h1>
-  <table>
+  <table class="table">
     <tr>
-      <th> Visailija </th>
-      <th> Oikeita vastauksia</th>    
-      <th> Vastattuja kysymyksiä</th>
+      <th scope="col"> Visailija </th>
+      <th scope="col"> Oikeita vastauksia</th>    
+      <th scope="col"> Vastattuja kysymyksiä</th>
     </tr>
     {% for score in scoreboard %}
       <tr>

@@ -41,6 +41,11 @@ def get_options(number: int):
     query_result = db.session.execute(sql, {"number": number}) 
     return query_result.fetchall()
 
+def get_question_ids():
+    sql = "SELECT id FROM questions"
+    query_result = db.session.execute(sql)
+    return query_result.fetchall()
+
 def get_scoreboard():
     sql = "SELECT U.username, CEILING((CAST(COUNT(*) FILTER (where O.correct) AS FLOAT) / COUNT(*)) * 100) AS correct_percentage, COUNT(*) AS total " \
           "FROM  answers A INNER JOIN options O ON A.option_id = O.id LEFT JOIN users U ON U.id = A.user_id " \
@@ -54,9 +59,13 @@ def get_user(username: str):
     return query_result.fetchone()
 
 def get_user_scores(id: int):
-    sql = "SELECT T.id, T.topic, COUNT(*) FILTER (where O.correct) AS correct, COUNT(*) AS total " \
-          "FROM answers A INNER JOIN options O on A.option_id = O.id INNER JOIN questions Q on Q.id = O.question_id RIGHT JOIN topic T ON T.id = Q.topic_id " \
-          "WHERE A.user_id =:user_id  GROUP BY T.id"
+    sql = "SELECT T.id, T.topic, COUNT(A.user_id) AS total, COUNT(*) FILTER (where O.correct) AS correct " \
+          "FROM questions Q " \
+          "INNER JOIN options O ON O.question_id = Q.id  " \
+          "INNER JOIN answers A ON A.option_id = O.id AND A.user_id =:user_id " \
+          "RIGHT JOIN topic T ON T.id = Q.topic_id " \
+          "GROUP BY T.id " \
+          "ORDER BY T.id"
     query_result = db.session.execute(sql, {"user_id": id})
     return query_result.fetchall()
 

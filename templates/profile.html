@@ -2,11 +2,18 @@
 {% block title %} Profiili {% endblock %}
 {% block content %}
   <h1> Profiili </h1>
-  <ul>
+  <table class="table">
+    <tr>
+      <th scope="col">Aihe</th>
+      <th scope="col">Oikein</th>
+      <th scope="col">Kysyttyjä</th>
+    </tr>
     {% for score in scores %}
-      <li>
-          {{ score.topic }} {{ score.correct }} / {{ score.total }}
-      </li>
-    {% endfor %}
-  </ul>
+      <tr>
+        <td>{{ score.topic }}</td>
+        <td>{{ score.correct }}</td>
+        <td>{{ score.total }}</td>
+      </tr>
+      {% endfor %}   
+  </table>
 {% endblock %}

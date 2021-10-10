@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %} Visa {% endblock %}
 {% block content %}
-  <form action="/result" method="POST">
+<!--  <form action="/result" method="POST">
     {% for question in questions %}
       <fieldset class="form-group">
         <legend> {{ questions[question][0].question }} </legend>
@@ -20,5 +20,23 @@
       </fieldset>
     {% endfor %}
     <input type="submit" value="Lähetä">
+  </form> -->
+  <form action="/quiz" method="POST">
+    {{ form.csrf_token() }}
+    {% for field in form.question %}
+      <fieldset class="form-group">
+        <legend> {{ field.label }} </legend>
+        {% for subfield in field %}
+          <div class="form-check">
+            {{ subfield.label }}
+            {{ subfield(required="required") }}
+          </div>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+    <div>
+      {{ form.submit }}
+    </div>
+
   </form>
 {% endblock %}

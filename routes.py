@@ -1,9 +1,8 @@
 from app import app 
-from db import db
 from flask import render_template, request, redirect, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from random import randint, shuffle
-from forms import AddForm, RegisterForm, LoginForm
+from forms import AddForm, QuizForm, RegisterForm, LoginForm
 import sql_commands
 
 @app.route("/")
@@ -14,22 +13,22 @@ def index():
 def start():
     return render_template("start.html")
 
-@app.route("/quiz")
+@app.route("/quiz", methods=["GET", "POST"]) 
 def quiz():
+    
     if "user_id" in session:
         remaining_questions = sql_commands.get_quiz(session["user_id"]) 
 
     if "user_id" in session and remaining_questions:
-        question_ids = set()
-        for question in remaining_questions:
-            question_ids.add(question.question)
+        question_ids = [question.question for question in remaining_questions]
         sql_commands.delete_quiz(session["user_id"])
-
+    elif "questions" in session:
+        question_ids = session["questions"]
     else:
-        total = sql_commands.question_count()
-        question_ids = set()
-        while len(question_ids) < 10:
-            question_ids.add(randint(1, total))
+        query = sql_commands.get_question_ids()
+        question_ids = [question.id for question in query]
+        shuffle(question_ids)
+        question_ids = question_ids[0:10]
 
     questions = {}    
     for question_id in question_ids:
@@ -39,27 +38,62 @@ def quiz():
 
     if "user_id" in session:
         for question_id in question_ids:
-            sql_commands.add_quiz(session["user_id"], question_id)    
+            sql_commands.add_quiz(session["user_id"], question_id)
+    else:
+        session["questions"] = question_ids
 
-    return render_template("quiz.html", questions=questions)
+    form = QuizForm()
+
+    i = 0
+    for question in questions:
+        form.question[i].label = questions[question][0].question
+        form.question[i].choices = [(questions[question][0].id, questions[question][0].option), (questions[question][1].id, questions[question][1].option), \
+            (questions[question][2].id, questions[question][2].option), (questions[question][3].id, questions[question][3].option)]
+        i += 1
+
+    if form.validate_on_submit():
+        data = form.question.data
+        score = 0
+    
+        for value in data:
+            correct = sql_commands.is_correct(value)
+            if correct:
+                score += 1
+            if "user_id" in session:
+                sql_commands.add_answer(value, session["user_id"])
+        if "user_id" in session:
+            sql_commands.delete_quiz(session["user_id"])
+        if "questions" in session:
+            del session["questions"]
+
+        return render_template("finish.html", score=score)
+    
+    return render_template("quiz.html", form=form)
 
 @app.route("/result", methods=["POST"])
 def result():
-    results = request.form
-    score = 0
-
-    for key in results.keys():
-        value = results.get(key)
-        correct = sql_commands.is_correct(value)
-        if correct:
-            score += 1
+    form = QuizForm(request.form)
+    print(form.question.data)
+    if form.validate_on_submit():
+        results = request.form
+        print(form.question.data)
+        score = 0
+    
+        for key in results.keys():
+            value = results.get(key)
+            correct = sql_commands.is_correct(value)
+            if correct:
+                score += 1
+            if "user_id" in session:
+                sql_commands.add_answer(value, session["user_id"])
+    
         if "user_id" in session:
-            sql_commands.add_answer(value, session["user_id"])
+            sql_commands.delete_quiz(session["user_id"])
+    
+        return render_template("finish.html", score=score)
 
-    if "user_id" in session:
-        sql_commands.delete_quiz(session["user_id"])
-
-    return render_template("finish.html", score=score)
+    print(form.errors)
+    return redirect("/quiz")
 
 @app.route("/scoreboard")
 def scoreboard():
@@ -85,6 +119,8 @@ def login():
                 if check_password_hash(hash_value, form.password.data):
                     session["user_id"] = user.id
                     session["admin"] = sql_commands.get_admin(user.id)
+                    if "questions" in session: 
+                        del session["questions"]
                     flash(f"Kirjauduttu sisään käyttäjänä {form.username.data}", "success")
                     return redirect("/")
                 else:

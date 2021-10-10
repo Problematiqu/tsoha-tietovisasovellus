@@ -4,7 +4,7 @@
 {% block content %}
   <div>
     <form action="/login" method="POST">
-      {{ form.hidden_tag() }}
+      {{ form.csrf_token() }}
       <fieldset class="form-group">
         <legend> Kirjaudu </legend>
         <div class="form-group">

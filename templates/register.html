@@ -3,13 +3,13 @@
 {% block content %}
   <div>
     <form action="/register" method="POST">
-      {{ form.hidden_tag() }}
+      {{ form.csrf_token() }}
       <fieldset class="form-group">
         <legend> Rekisteröidy </legend>
         <div class="form-group">
           {{ form.username.label(class="form-control-label") }}
           {% if form.username.errors %}
-            {{ form.username(class="is-invalid form-control form-control-lg")}}
+            {{ form.username(class="is-invalid")}}
             <div class="invalid-feedback">
               {% for error in form.username.errors %}
                 <span> {{ error }} </span>
