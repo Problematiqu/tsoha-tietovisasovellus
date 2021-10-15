@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block title %} Tietovisasovellus {% endblock %}
 {% block content %}
-  <p> Huikea tietovisaelämys alkaa tästä! Kirjautumalla sisään voit seurata omaa menestystäsi</p>
-  <form action="/quiz" method="GET">
-    <input type="submit" value="Aloita visa!">
-  </form>
+  <div class="container mt-3">
+    <div class="col-sm-12">
+      <p> Huikea tietovisaelämys alkaa tästä! Jos haluat seurata menestystäsi, muista kirjautua sisään.</p>
+      <form action="/quiz" method="GET">
+        <input type="submit" value="Aloita visa!" class="btn btn-outline-dark btn-lg">
+      </form>
+    </div>
+  </div>
 {% endblock %}

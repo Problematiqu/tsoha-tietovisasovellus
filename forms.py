@@ -4,21 +4,21 @@ from wtforms.validators import InputRequired, Length, EqualTo
 import sql_commands
 
 class RegisterForm(FlaskForm):
-    username = StringField("Käyttäjänimi", validators=[
+    username = StringField("Käyttäjänimi:", validators=[
         InputRequired(message="Käyttäjänimi ei saa olla tyhjä"),
         Length(min=3, max=20, message="Nimen tulee olla %(min)d - %(max)d merkin pituinen")])
-    password = PasswordField("Salasana", validators=[
+    password = PasswordField("Salasana:", validators=[
         InputRequired(message="Salasana ei saa olla tyhjä"),
         Length(min=3, max=20, message="Salasanan tulee olla %(min)d - %(max)d merkin pituinen")])
-    repeated_password = PasswordField("Salasana uusiksi", validators=[
+    repeated_password = PasswordField("Salasana uudestaan:", validators=[
         InputRequired(message="Salasana uusiksi ei saa olla tyhjä"),
         EqualTo("password", message="Salasanat eivät olleet samoja")])
     submit = SubmitField("Rekisteröidy")
 
 class LoginForm(FlaskForm):
-    username = StringField("Käyttäjänimi", validators=[
+    username = StringField("Käyttäjänimi:", validators=[
         InputRequired(message="Käyttäjänimi ei saa olla tyhjä")])
-    password = PasswordField("Salasana", validators=[
+    password = PasswordField("Salasana:", validators=[
         InputRequired(message="Salasana ei saa olla tyhjä")])
     submit = SubmitField("Kirjaudu")
 

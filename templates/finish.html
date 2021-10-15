@@ -1,5 +1,28 @@
 {% extends "base.html" %}
 {% block title %} Tietovisasovellus {% endblock %}
 {% block content %}
-  <p> Sait {{ score }} pistettä!</p>
+  <div class="container mt-3">
+    <div class="col-sm-6">
+      <h3> Tulokset: </h3>
+      {% if score == 1%}
+        <p class="text-start"> Sait <b>{{ score }}</b> pisteen!</p>
+      {% else %}
+        <p class="text-start"> Sait <b>{{ score }}</b> pistettä!</p>
+      {% endif %}
+      {% if score <= 3%}
+        <p class="text-start"> Ei kerrota tästä tuloksesta kenellekään! </p>
+      {% elif score <= 5%}
+        <p class="text-start">Tästä on hyvä jatkaa eteenpäin!</p>      
+      {% elif score <= 7%}
+        <p class="text-start">Ei hullumpi tulos!</p> 
+      {% elif score <= 9%}
+        <p class="text-start">Olet aikamoinen tietonikkari!</p> 
+      {% elif score == 10%}
+        <p class="text-start">Sinä olet ihan pitelemätön!</p> 
+      {% endif %}
+      <form action="/quiz" method="GET">
+        <input type="submit" value="Uusi visa" class="btn btn-outline-dark btn-lg">
+      </form>
+    </div>
+  </div>
 {% endblock %}

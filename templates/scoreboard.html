@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block title %} Scoreboard {% endblock %}
 {% block content %}
+<div class="container mt-3 mb-4">
   <h1> Top-20 visailijat:</h1>
-  <table class="table">
-    <tr>
-      <th scope="col"> Visailija </th>
-      <th scope="col"> Oikeita vastauksia</th>    
-      <th scope="col"> Vastattuja kysymyksiä</th>
-    </tr>
-    {% for score in scoreboard %}
+  <table class="table mt-4 table-striped">
+    <thead>
       <tr>
-          <td> {{ score.username }} </td>
-          <td> {{ score.correct_percentage }}% </td>
-          <td> {{ score.total }}</td>
+        <th scope="col"> Visailija </th>
+        <th scope="col"> Oikeita vastauksia</th>    
+        <th scope="col"> Vastattuja kysymyksiä</th>
       </tr>
-    {% endfor %}
+    </thead>
+    <tbody>
+      {% for score in scoreboard %}
+      <tr>
+        <td> {{ score.username }} </td>
+        <td> {{ score.correct_percentage }}% </td>
+        <td> {{ score.total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
   </table>
+</div>
 {% endblock %}

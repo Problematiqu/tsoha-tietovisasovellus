@@ -1,53 +1,59 @@
 {% extends "base.html" %}
 {% block title %} Rekisteröinti {% endblock %}
 {% block content %}
-  <div>
-    <form action="/register" method="POST">
+  <div class="container mt-3">
+    <form action="/register" method="POST" class="mt-4">
       {{ form.csrf_token() }}
-      <fieldset class="form-group">
-        <legend> Rekisteröidy </legend>
-        <div class="form-group">
-          {{ form.username.label(class="form-control-label") }}
-          {% if form.username.errors %}
-            {{ form.username(class="is-invalid")}}
-            <div class="invalid-feedback">
-              {% for error in form.username.errors %}
-                <span> {{ error }} </span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.username() }}
-          {% endif %}
+        <div class="row mb-3">
+          <h3 class="col-sm-1">Rekisteröidy:</h3>
         </div>
-        <div class="form-group">
-          {{ form.password.label(class="form-control-label") }}
-          {% if form.password.errors %}
-            {{ form.password(class="is-invalid")}}
-            <div class="invalid-feedback">
-              {% for error in form.password.errors %}
+        <div class="row mb-3">
+          {{ form.username.label(class="form-label col-sm-1") }}
+          <div class="col-sm-4">
+            {% if form.username.errors %}
+              {{ form.username(class="is-invalid form-control")}}
+              <div class="invalid-feedback">
+                {% for error in form.username.errors %}
                 <span> {{ error }} </span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.password() }}
-          {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.username(class="form-control", placeholder="Käyttäjänimen tulee olla 3-20 merkkiä pitkä") }}
+            {% endif %}
+          </div>
         </div>
-        <div class="form-group">
-          {{ form.repeated_password.label(class="form-control-label") }}
-          {% if form.repeated_password.errors %}
-            {{ form.repeated_password(class="is-invalid")}}
-            <div class="invalid-feedback">
-              {% for error in form.repeated_password.errors %}
+        <div class="row mb-3">
+          {{ form.password.label(class="form-control-label col-sm-1") }}
+          <div class="col-sm-4">
+            {% if form.password.errors %}
+              {{ form.password(class="is-invalid form-control")}}
+              <div class="invalid-feedback">
+                {% for error in form.password.errors %}
                 <span> {{ error }} </span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.repeated_password() }}
-          {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.password(class="form-control", placeholder="Salasanan tulee olla 3-20 merkkiä pitkä") }}
+            {% endif %}
+          </div>
         </div>
-      </fieldset>
+        <div class="row mb-3">
+          {{ form.repeated_password.label(class="form-control-label col-sm-1") }}
+          <div class="col-sm-4">
+            {% if form.repeated_password.errors %}
+              {{ form.repeated_password(class="is-invalid form-control")}}
+              <div class="invalid-feedback">
+                {% for error in form.repeated_password.errors %}
+                <span> {{ error }} </span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.repeated_password(class="form-control", placeholder="Salasanojen täytyy täsmätä") }}
+            {% endif %}
+          </div>
+        </div>
       <div class="form-group">
-        {{ form.submit() }}
+        {{ form.submit(class="btn btn-outline-dark") }}
       </div>
     </form>
   </div>

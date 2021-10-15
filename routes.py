@@ -107,6 +107,7 @@ def login():
 def logout():
     del session["user_id"]
     del session["admin"]
+    flash("Kirjauduttu ulos", "info")
     return redirect("/")
 
 @app.route("/register", methods=["GET", "POST"])

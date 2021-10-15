@@ -1,68 +1,76 @@
 {% extends "base.html" %}
 {% block title %} Tietovisasovellus {% endblock %}
 {% block content %}
-  <div>
+  <div class="container mt-3">
     <form action="/add" method="POST">
-      {{ form.hidden_tag() }}
-      <fieldset class="form-group">
-        <legend> Lisää kysymys </legend>
-        <div class="form-group">
-          {{ form.question.label() }}
+      {{ form.csrf_token() }}
+      <div class="row mb-3">
+        <h3 class="col-sm-6">Lisää kysymys:</h2>
+      </div>
+      <div class="row mb-3">
+        {{ form.question.label(class="form-label col-sm-1") }}
+        <div class="col-sm-4">
           {% if form.question.errors %}
-            {{ form.question(class="is-invalid")}}
-            <div class="invalid-feedback">
-              {% for error in form.question.errors %}
-                <span> {{ error }} </span>
-              {% endfor %}
-            </div>
+          {{ form.question(class="is-invalid form-control") }}
+          <div class="invalid-feedback">
+            {% for error in form.question.errors %}
+            <span> {{ error }} </span>
+            {% endfor %}
+          </div>
           {% else %}
-            {{ form.question() }}
+          {{ form.question(class="form-control") }}
           {% endif %}
         </div>
-        <div class="form-group">
-          {{ form.topic.label() }}
+      </div>
+      <div class="row mb-3">
+        {{ form.topic.label(class="form-label col-sm-1") }}
+        <div class="col-sm-4">
           {% if form.topic.errors %}
-            {{ form.topic(class="is-invalid")}}
-            <div class="invalid-feedback">
-              {% for error in form.topic.errors %}
-                <span> {{ error }} </span>
-              {% endfor %}
-            </div>
+          {{ form.topic(class="is-invalid form-select") }}
+          <div class="invalid-feedback">
+            {% for error in form.topic.errors %}
+            <span> {{ error }} </span>
+            {% endfor %}
+          </div>
           {% else %}
-            {{ form.topic() }}
+            {{ form.topic(class="form-select") }}
           {% endif %}
         </div>
-        <div class="form-group">
-          {{ form.correct.label() }}
+      </div>
+      <div class="row mb-3">
+        {{ form.correct.label(class="form-label col-sm-1") }}
+        <div class="col-sm-4">
           {% if form.correct.errors %}
-            {{ form.correct(class="is-invalid")}}
+            {{ form.correct(class="is-invalid form-control") }}
             <div class="invalid-feedback">
               {% for error in form.correct.errors %}
                 <span> {{ error }} </span>
               {% endfor %}
             </div>
           {% else %}
-            {{ form.correct() }}
+            {{ form.correct(class="form-control") }}
           {% endif %}
         </div>
-        {% for field in form.incorrect %}
-          <div class="form-group">
-            {{ field.label() }} 
+      </div>
+      {% for field in form.incorrect %}
+        <div class="row mb-3">
+          {{ field.label(class="form-label col-sm-1") }}
+          <div class="col-sm-4">
             {% if field.errors %}
-              {{ form.correct(class="is-invalid")}}
-              <div class="invalid-feedback">
+             {{ field(class="is-invalid form-control")}}
+               <div class="invalid-feedback">
                 {% for error in field.errors %}
-                  <span> {{ error }}</span>
+                <span> {{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{field()}}
+              {{field(class="form-control")}}
             {% endif %}
-          </div>
-        {% endfor %}
-      </fieldset>
+          </div> 
+        </div>
+      {% endfor %}
       <div class="form-group">
-        {{ form.submit }}
+        {{ form.submit(class="btn btn-outline-dark") }}
       </div>
     </form>
   </div>

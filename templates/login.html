@@ -2,40 +2,46 @@
 {% block title %} Kirjautuminen 
 {% endblock %}
 {% block content %}
-  <div>
-    <form action="/login" method="POST">
+  <div class="container mt-3">
+    <form action="/login" method="POST" class="mt-4">
       {{ form.csrf_token() }}
-      <fieldset class="form-group">
-        <legend> Kirjaudu </legend>
-        <div class="form-group">
-          {{ form.username.label() }}
-          {% if form.username.errors %}
-            {{ form.username(class="is-invalid")}}
-            <div class="invalid-feedback">
-              {% for error in form.username.errors %}
-                <span> {{ error }} </span>
-              {% endfor %}
-            </div>
+      <div class="row mb-3">
+        <h3 class="col-sm-1">Kirjaudu:</h2>
+      </div>
+      <div class="row mb-3">
+        {{ form.username.label(class="form-label col-sm-1") }}
+        <div class="col-sm-4">
+        {% if form.username.errors %} 
+          {{ form.username(class="is-invalid form-control")}}
+          <div class="invalid-feedback">
+            {% for error in form.username.errors %}
+            <span> {{ error }} </span>
+            {% endfor %}
+          </div>
           {% else %}
-            {{ form.username() }}
-          {% endif %}
+          {{ form.username(class="form-control") }}
+        {% endif %}
         </div>
-        <div class="form-group">
-          {{ form.password.label() }}
-          {% if form.password.errors %}
-            {{ form.password(class="is-invalid")}}
-            <div class="invalid-feedback">
-              {% for error in form.password.errors %}
-                <span> {{ error }} </span>
-              {% endfor %}
-            </div>
-          {% else %}
-            {{ form.password() }}
-          {% endif %}
+      </div>
+      <div class="row mb-3">
+        {{ form.password.label(class="form-label col-sm-1") }}
+        <div class="col-sm-4">
+        {% if form.password.errors %}
+          {{ form.password(class="is-invalid form-control")}}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}
+              <span> {{ error }} </span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.password(class="form-control") }}
+        {% endif %}
         </div>
-      </fieldset>
-      <div class="form-group">
-        {{ form.submit }}
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-1">          
+          {{ form.submit(class="btn btn-outline-dark") }}
+        </div>
       </div>
     </form>
   </div>
